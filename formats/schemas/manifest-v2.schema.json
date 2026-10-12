@@ -1,0 +1,155 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://raw.githubusercontent.com/zihangli-hndsm/VOLK-API/main/formats/schemas/manifest-v2.schema.json",
+  "title": "VOLK Episode Package Manifest v2",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schemaVersion",
+    "id",
+    "contentVersion",
+    "order",
+    "status",
+    "titleKey",
+    "summaryKey",
+    "playgroundId",
+    "adapterId",
+    "requiredCapabilities",
+    "defaultLocale",
+    "files"
+  ],
+  "properties": {
+    "schemaVersion": {
+      "const": "volk.episode-package.v2"
+    },
+    "id": {
+      "$ref": "#/$defs/id"
+    },
+    "contentVersion": {
+      "type": "string",
+      "pattern": "^(0|[1-9][0-9]*)\\.(0|[1-9][0-9]*)\\.(0|[1-9][0-9]*)(-[0-9A-Za-z.-]+)?$",
+      "maxLength": 64
+    },
+    "order": {
+      "type": "integer",
+      "minimum": 0,
+      "maximum": 1000000
+    },
+    "status": {
+      "enum": [
+        "draft",
+        "published"
+      ]
+    },
+    "featured": {
+      "type": "boolean"
+    },
+    "titleKey": {
+      "$ref": "#/$defs/messageKey"
+    },
+    "summaryKey": {
+      "$ref": "#/$defs/messageKey"
+    },
+    "playgroundId": {
+      "$ref": "#/$defs/id"
+    },
+    "adapterId": {
+      "$ref": "#/$defs/id"
+    },
+    "requiredCapabilities": {
+      "type": "array",
+      "maxItems": 32,
+      "uniqueItems": true,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "id",
+          "version"
+        ],
+        "properties": {
+          "id": {
+            "$ref": "#/$defs/capabilityId"
+          },
+          "version": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 65535
+          }
+        }
+      }
+    },
+    "defaultLocale": {
+      "const": "en"
+    },
+    "files": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "learning",
+        "agent",
+        "director",
+        "locales"
+      ],
+      "properties": {
+        "learning": {
+          "$ref": "#/$defs/packageJsonPath"
+        },
+        "agent": {
+          "$ref": "#/$defs/packageJsonPath"
+        },
+        "director": {
+          "$ref": "#/$defs/packageJsonPath"
+        },
+        "locales": {
+          "type": "object",
+          "minProperties": 1,
+          "maxProperties": 16,
+          "required": [
+            "en"
+          ],
+          "propertyNames": {
+            "$ref": "#/$defs/localeTag"
+          },
+          "additionalProperties": {
+            "$ref": "#/$defs/packageJsonPath"
+          }
+        }
+      }
+    }
+  },
+  "$defs": {
+    "id": {
+      "type": "string",
+      "pattern": "^[a-z][a-z0-9]*(?:-[a-z0-9]+)*$",
+      "minLength": 2,
+      "maxLength": 64
+    },
+    "capabilityId": {
+      "enum": [
+        "episode.learning.runner",
+        "episode.package.catalog",
+        "visualization.script.runtime",
+        "world.observation.sample",
+        "model.fit",
+        "experiment.compare"
+      ]
+    },
+    "messageKey": {
+      "type": "string",
+      "pattern": "^[a-z][a-z0-9]*(?:[.-][a-zA-Z0-9]+)*$",
+      "minLength": 2,
+      "maxLength": 128
+    },
+    "localeTag": {
+      "type": "string",
+      "pattern": "^[a-z]{2,3}(?:-[A-Z][a-z]{3})?(?:-(?:[A-Z]{2}|[0-9]{3}))?$",
+      "maxLength": 35
+    },
+    "packageJsonPath": {
+      "type": "string",
+      "pattern": "^(?!/)(?!.*(?:^|/)\\.\\.(?:/|$))(?!.*:)[A-Za-z0-9._/-]+\\.json$",
+      "maxLength": 240
+    }
+  }
+}

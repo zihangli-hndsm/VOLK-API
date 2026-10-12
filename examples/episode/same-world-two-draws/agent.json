@@ -1,0 +1,12 @@
+{
+  "schemaVersion": "volk.episode-agent.v1",
+  "budgets": { "maxHintsPerNode": 2, "cooldownMs": 5000 },
+  "cloudCandidates": [],
+  "nodes": [
+    { "nodeId": "fit-first", "questionPromptKeys": ["questions.fit-first"], "allowedContextSelectors": ["currentNode", "currentFacts"], "candidateIds": [], "staySilent": true },
+    { "nodeId": "choose-next", "questionPromptKeys": ["questions.choose-next"], "allowedContextSelectors": ["currentNode", "currentFacts"], "candidateIds": [], "staySilent": true },
+    { "nodeId": "take-sample", "questionPromptKeys": ["questions.sample"], "allowedContextSelectors": ["currentNode", "currentFacts"], "candidateIds": [], "staySilent": true },
+    { "nodeId": "fit-second", "questionPromptKeys": ["questions.fit-second"], "allowedContextSelectors": ["currentNode", "currentFacts"], "candidateIds": [], "staySilent": true },
+    { "nodeId": "compare", "questionPromptKeys": ["questions.compare"], "allowedContextSelectors": ["currentNode", "currentFacts"], "candidateIds": [], "staySilent": true }
+  ]
+}

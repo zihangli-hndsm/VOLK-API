@@ -1,0 +1,82 @@
+{
+  "schemaVersion": "volk.episode-learning.v1",
+  "initialScenario": { "kind": "preset", "id": "sampling-variability-world", "seed": 8202 },
+  "startNodeId": "fit-first",
+  "limits": { "maxTransitions": 24, "maxVisitsPerNode": 6 },
+  "nodes": [
+    {
+      "id": "fit-first",
+      "kind": "action",
+      "titleKey": "learning.fit-first.title",
+      "bodyKey": "learning.fit-first.body",
+      "semanticTarget": "model",
+      "actions": [
+        { "id": "fit-baseline", "capability": "model.fit", "operation": "FIT_MODEL", "parameters": { "slot": "baseline" }, "learnerConfirmation": true, "successFact": "fit.baseline.valid" }
+      ],
+      "transitions": [
+        { "id": "fit-to-choice", "priority": 1, "when": { "fact": "fit.baseline.valid", "equals": true }, "toNodeId": "choose-next" }
+      ],
+      "localFallback": { "messageKey": "agent.local.fit", "actionIds": ["fit-baseline"], "staySilent": false }
+    },
+    {
+      "id": "choose-next",
+      "kind": "choice",
+      "titleKey": "learning.choose.title",
+      "bodyKey": "learning.choose.body",
+      "choices": [
+        { "id": "sample-again", "labelKey": "choices.sample-again", "toNodeId": "take-sample", "maxTraversals": 2 },
+        { "id": "compare-now", "labelKey": "choices.compare-now", "toNodeId": "compare" }
+      ],
+      "localFallback": { "messageKey": "agent.local.choose", "staySilent": true }
+    },
+    {
+      "id": "take-sample",
+      "kind": "action",
+      "titleKey": "learning.sample.title",
+      "bodyKey": "learning.sample.body",
+      "semanticTarget": "data",
+      "actions": [
+        { "id": "resample-world", "capability": "world.observation.sample", "operation": "RESAMPLE_WORLD", "learnerConfirmation": true, "successFact": "observation.sampled" }
+      ],
+      "transitions": [
+        { "id": "sample-to-refit", "priority": 1, "when": { "fact": "observation.sampled", "equals": true }, "toNodeId": "fit-second" }
+      ],
+      "localFallback": { "messageKey": "agent.local.sample", "actionIds": ["resample-world"], "staySilent": false }
+    },
+    {
+      "id": "fit-second",
+      "kind": "action",
+      "titleKey": "learning.fit-second.title",
+      "bodyKey": "learning.fit-second.body",
+      "semanticTarget": "model",
+      "actions": [
+        { "id": "fit-active", "capability": "model.fit", "operation": "FIT_MODEL", "parameters": { "slot": "active" }, "learnerConfirmation": true, "successFact": "fit.active.valid" }
+      ],
+      "transitions": [
+        { "id": "refit-to-compare", "priority": 1, "when": { "fact": "fit.active.valid", "equals": true }, "toNodeId": "compare" }
+      ],
+      "localFallback": { "messageKey": "agent.local.fit", "actionIds": ["fit-active"], "staySilent": false }
+    },
+    {
+      "id": "compare",
+      "kind": "action",
+      "titleKey": "learning.compare.title",
+      "bodyKey": "learning.compare.body",
+      "semanticTarget": "comparison",
+      "actions": [
+        { "id": "create-comparison", "capability": "experiment.compare", "operation": "CREATE_COMPARISON", "learnerConfirmation": true, "successFact": "comparison.current.completed" }
+      ],
+      "transitions": [
+        { "id": "comparison-finished", "priority": 1, "when": { "fact": "comparison.current.completed", "equals": true }, "toNodeId": "finish" }
+      ],
+      "localFallback": { "messageKey": "agent.local.compare", "actionIds": ["create-comparison"], "staySilent": false }
+    },
+    {
+      "id": "finish",
+      "kind": "end",
+      "titleKey": "learning.end.title",
+      "bodyKey": "learning.end.body",
+      "localFallback": { "messageKey": "agent.local.end", "staySilent": true }
+    }
+  ]
+}

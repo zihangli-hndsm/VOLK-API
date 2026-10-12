@@ -1,0 +1,30 @@
+{
+  "schemaVersion": "volk.episode-package.v2",
+  "id": "same-world-two-draws",
+  "contentVersion": "1.0.0",
+  "order": 3,
+  "status": "published",
+  "featured": true,
+  "titleKey": "episode.title",
+  "summaryKey": "episode.summary",
+  "playgroundId": "data-lab",
+  "adapterId": "linear-regression",
+  "requiredCapabilities": [
+    { "id": "episode.learning.runner", "version": 1 },
+    { "id": "episode.package.catalog", "version": 1 },
+    { "id": "visualization.script.runtime", "version": 1 },
+    { "id": "world.observation.sample", "version": 1 },
+    { "id": "model.fit", "version": 1 },
+    { "id": "experiment.compare", "version": 1 }
+  ],
+  "defaultLocale": "en",
+  "files": {
+    "learning": "learning.json",
+    "agent": "agent.json",
+    "director": "director.json",
+    "locales": {
+      "en": "locales/en.json",
+      "fr": "locales/fr.json"
+    }
+  }
+}
