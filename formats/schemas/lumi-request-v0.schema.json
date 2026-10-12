@@ -1,0 +1,62 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://raw.githubusercontent.com/zihangli-hndsm/VOLK-API/main/formats/schemas/lumi-request-v0.schema.json",
+  "title": "VOLK Cloud canonical LUMI request v0",
+  "description": "Canonical camelCase request shape. The implementation may also accept selected historical input aliases documented in api/README.md; new clients should use canonical field names.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["apiVersion", "inquiry"],
+  "properties": {
+    "apiVersion": { "type": "string", "minLength": 1, "maxLength": 16 },
+    "inquiry": { "$ref": "#/$defs/inquiry" },
+    "prediction": { "anyOf": [{ "$ref": "#/$defs/prediction" }, { "type": "null" }] },
+    "experiment": { "anyOf": [{ "$ref": "#/$defs/experiment" }, { "type": "null" }] },
+    "recentEvents": { "type": "array", "maxItems": 32, "items": { "$ref": "#/$defs/event" } },
+    "evidence": { "type": "array", "maxItems": 32, "items": { "$ref": "#/$defs/evidence" } },
+    "candidateConcepts": { "type": "array", "maxItems": 32, "items": { "$ref": "#/$defs/concept" } },
+    "conceptsEncountered": { "type": "array", "maxItems": 64, "items": { "type": "string", "maxLength": 128 } },
+    "conceptsEvidenced": { "type": "array", "maxItems": 64, "items": { "type": "string", "maxLength": 128 } },
+    "recentLumiActions": { "type": "array", "maxItems": 16, "items": { "$ref": "#/$defs/actionSummary" } },
+    "policy": { "anyOf": [{ "$ref": "#/$defs/policy" }, { "type": "null" }] },
+    "requestId": { "type": ["string", "null"], "maxLength": 128 }
+  },
+  "$defs": {
+    "inquiry": {
+      "type": "object", "additionalProperties": false,
+      "properties": {
+        "inquiryId": { "type": ["string", "null"], "maxLength": 128 },
+        "orchestrationId": { "type": ["string", "null"], "maxLength": 128 },
+        "currentQuestion": { "type": ["string", "null"], "maxLength": 2000 },
+        "currentDepth": { "type": ["string", "null"], "maxLength": 64 }
+      }
+    },
+    "prediction": {
+      "type": "object", "additionalProperties": false, "required": ["expectation"],
+      "properties": { "expectation": { "type": "string", "minLength": 1, "maxLength": 2000 }, "reasoning": { "type": ["string", "null"], "maxLength": 4000 } }
+    },
+    "experiment": {
+      "type": "object", "additionalProperties": false,
+      "properties": { "worldIdentity": { "type": ["string", "null"], "maxLength": 256 }, "baseline": { "type": ["string", "null"], "maxLength": 1000 }, "activeComparison": { "type": ["string", "null"], "maxLength": 1000 } }
+    },
+    "event": {
+      "type": "object", "additionalProperties": false, "required": ["eventType"],
+      "properties": { "eventId": { "type": ["string", "null"], "maxLength": 128 }, "eventType": { "type": "string", "minLength": 1, "maxLength": 128 }, "summary": { "type": ["string", "null"], "maxLength": 2000 } }
+    },
+    "evidence": {
+      "type": "object", "additionalProperties": false, "required": ["evidenceId", "evidenceType"],
+      "properties": { "evidenceId": { "type": "string", "minLength": 1, "maxLength": 128 }, "evidenceType": { "type": "string", "minLength": 1, "maxLength": 128 }, "summary": { "type": ["string", "null"], "maxLength": 2000 }, "facts": { "type": "array", "maxItems": 16, "items": { "type": "string", "maxLength": 2000 } } }
+    },
+    "concept": {
+      "type": "object", "additionalProperties": false, "required": ["conceptId", "label"],
+      "properties": { "conceptId": { "type": "string", "minLength": 1, "maxLength": 128 }, "label": { "type": "string", "minLength": 1, "maxLength": 256 }, "confidence": { "type": ["number", "null"], "minimum": 0, "maximum": 1 } }
+    },
+    "actionSummary": {
+      "type": "object", "additionalProperties": false, "required": ["action"],
+      "properties": { "action": { "enum": ["ASK", "SUGGEST_EXPERIMENT", "PROPOSE_HYPOTHESIS", "PROPOSE_COUNTEREXAMPLE", "HIGHLIGHT_EVIDENCE", "OFFER_COMPARISON", "OFFER_DEPTH", "NAME_CONNECTION", "REFLECT_PATH", "STAY_SILENT"] }, "reasonCode": { "type": ["string", "null"], "maxLength": 128 } }
+    },
+    "policy": {
+      "type": "object", "additionalProperties": false,
+      "properties": { "autonomyLevel": { "type": ["string", "null"], "maxLength": 64 }, "proactiveAllowed": { "type": "boolean", "default": true } }
+    }
+  }
+}

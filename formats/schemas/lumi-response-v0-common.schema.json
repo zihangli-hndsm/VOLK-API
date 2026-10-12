@@ -1,0 +1,62 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://raw.githubusercontent.com/zihangli-hndsm/VOLK-API/main/formats/schemas/lumi-response-v0-common.schema.json",
+  "title": "Shared typed LUMI response fields v0",
+  "type": "object",
+  "allOf": [
+    { "$ref": "#/$defs/common" },
+    {
+      "oneOf": [
+        { "$ref": "#/$defs/ask" },
+        { "$ref": "#/$defs/suggestExperiment" },
+        { "$ref": "#/$defs/proposeHypothesis" },
+        { "$ref": "#/$defs/proposeCounterexample" },
+        { "$ref": "#/$defs/highlightEvidence" },
+        { "$ref": "#/$defs/offerComparison" },
+        { "$ref": "#/$defs/offerDepth" },
+        { "$ref": "#/$defs/nameConnection" },
+        { "$ref": "#/$defs/reflectPath" },
+        { "$ref": "#/$defs/staySilent" }
+      ]
+    }
+  ],
+  "$defs": {
+    "common": {
+      "type": "object",
+      "required": ["apiVersion", "requestId", "action", "payload", "message", "requiresLearnerConfirmation", "reasonCode"],
+      "properties": {
+        "apiVersion": { "const": "0" },
+        "requestId": { "type": "string", "minLength": 1, "maxLength": 128 },
+        "action": { "enum": ["ASK", "SUGGEST_EXPERIMENT", "PROPOSE_HYPOTHESIS", "PROPOSE_COUNTEREXAMPLE", "HIGHLIGHT_EVIDENCE", "OFFER_COMPARISON", "OFFER_DEPTH", "NAME_CONNECTION", "REFLECT_PATH", "STAY_SILENT"] },
+        "payload": { "type": "object" },
+        "message": { "type": ["string", "null"], "maxLength": 3000 },
+        "requiresLearnerConfirmation": { "type": "boolean" },
+        "reasonCode": { "type": ["string", "null"], "maxLength": 128 }
+      }
+    },
+    "emptyPayload": { "type": "object", "maxProperties": 0 },
+    "textPayload": {
+      "type": "object", "additionalProperties": false, "required": ["text"],
+      "properties": { "text": { "type": "string", "minLength": 1, "maxLength": 2000 } }
+    },
+    "ask": {
+      "type": "object", "required": ["action", "payload", "requiresLearnerConfirmation"],
+      "properties": { "action": { "const": "ASK" }, "payload": { "type": "object", "additionalProperties": false, "required": ["question"], "properties": { "question": { "type": "string", "minLength": 1, "maxLength": 2000 } } }, "requiresLearnerConfirmation": { "const": false } }
+    },
+    "suggestExperiment": {
+      "type": "object", "required": ["action", "payload", "requiresLearnerConfirmation"],
+      "properties": { "action": { "const": "SUGGEST_EXPERIMENT" }, "payload": { "type": "object", "additionalProperties": false, "required": ["recipeId", "description"], "properties": { "recipeId": { "type": "string", "minLength": 1, "maxLength": 128, "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$" }, "description": { "type": "string", "minLength": 1, "maxLength": 2000 } } }, "requiresLearnerConfirmation": { "const": true } }
+    },
+    "proposeHypothesis": { "type": "object", "required": ["action", "payload", "requiresLearnerConfirmation"], "properties": { "action": { "const": "PROPOSE_HYPOTHESIS" }, "payload": { "$ref": "#/$defs/textPayload" }, "requiresLearnerConfirmation": { "const": true } } },
+    "proposeCounterexample": { "type": "object", "required": ["action", "payload", "requiresLearnerConfirmation"], "properties": { "action": { "const": "PROPOSE_COUNTEREXAMPLE" }, "payload": { "$ref": "#/$defs/textPayload" }, "requiresLearnerConfirmation": { "const": true } } },
+    "highlightEvidence": {
+      "type": "object", "required": ["action", "payload", "requiresLearnerConfirmation"],
+      "properties": { "action": { "const": "HIGHLIGHT_EVIDENCE" }, "payload": { "type": "object", "additionalProperties": false, "required": ["evidenceIds", "facts"], "properties": { "evidenceIds": { "type": "array", "minItems": 1, "maxItems": 8, "items": { "type": "string", "minLength": 1, "maxLength": 128 } }, "facts": { "type": "array", "maxItems": 16, "items": { "type": "string", "maxLength": 2000 } } } }, "requiresLearnerConfirmation": { "const": false } }
+    },
+    "offerComparison": { "type": "object", "required": ["action", "payload", "requiresLearnerConfirmation"], "properties": { "action": { "const": "OFFER_COMPARISON" }, "payload": { "$ref": "#/$defs/emptyPayload" }, "requiresLearnerConfirmation": { "const": false } } },
+    "offerDepth": { "type": "object", "required": ["action", "payload", "requiresLearnerConfirmation"], "properties": { "action": { "const": "OFFER_DEPTH" }, "payload": { "type": "object", "additionalProperties": false, "required": ["target"], "properties": { "target": { "enum": ["evidence", "mechanism", "representation", "math", "builder"] } } }, "requiresLearnerConfirmation": { "const": false } } },
+    "nameConnection": { "type": "object", "required": ["action", "payload", "requiresLearnerConfirmation"], "properties": { "action": { "const": "NAME_CONNECTION" }, "payload": { "$ref": "#/$defs/textPayload" }, "requiresLearnerConfirmation": { "const": false } } },
+    "reflectPath": { "type": "object", "required": ["action", "payload", "requiresLearnerConfirmation"], "properties": { "action": { "const": "REFLECT_PATH" }, "payload": { "$ref": "#/$defs/textPayload" }, "requiresLearnerConfirmation": { "const": false } } },
+    "staySilent": { "type": "object", "required": ["action", "payload", "requiresLearnerConfirmation"], "properties": { "action": { "const": "STAY_SILENT" }, "payload": { "$ref": "#/$defs/emptyPayload" }, "requiresLearnerConfirmation": { "const": false } } }
+  }
+}

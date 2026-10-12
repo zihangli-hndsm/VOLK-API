@@ -1,0 +1,87 @@
+{
+  "schemaVersion": "volk.episode-contract-registry.v1",
+  "registryVersion": "volk.episode-contract-registry.v1",
+  "source": "VOLK-ML registered runtime capabilities at Episode Package v1",
+  "factPredicates": [
+    {
+      "id": "fit.baseline.valid",
+      "version": 1,
+      "valueType": "boolean",
+      "source": "authoritative completed baseline-fit runtime state",
+      "meaning": "A valid baseline fit exists in the current learning-session context."
+    },
+    {
+      "id": "fit.active.valid",
+      "version": 1,
+      "valueType": "boolean",
+      "source": "authoritative completed active-fit runtime state",
+      "meaning": "A valid active fit exists in the current learning-session context."
+    },
+    {
+      "id": "fit.current.valid",
+      "version": 1,
+      "valueType": "boolean",
+      "source": "authoritative current fit runtime state",
+      "meaning": "A valid current fit exists; this does not assert understanding."
+    },
+    {
+      "id": "comparison.current.completed",
+      "version": 1,
+      "valueType": "boolean",
+      "source": "authoritative comparison runtime result",
+      "meaning": "The current requested comparison completed."
+    },
+    {
+      "id": "evidence.detector.status",
+      "version": 1,
+      "valueType": "enum",
+      "values": ["none", "valid-weak", "evidenced", "inconclusive"],
+      "source": "deterministic registered detector output",
+      "meaning": "Detector status only; never learner mastery or causal proof."
+    },
+    {
+      "id": "observation.sampled",
+      "version": 1,
+      "valueType": "boolean",
+      "source": "authoritative observation-sampling semantic event",
+      "meaning": "A real observation sampling operation completed in this session."
+    },
+    {
+      "id": "learner.prediction.present",
+      "version": 1,
+      "valueType": "boolean",
+      "source": "learner-authored prediction record",
+      "meaning": "The learner recorded a prediction; this does not assert correctness or understanding."
+    }
+  ],
+  "requiredCapabilities": [
+    { "id": "episode.learning.runner", "version": 1, "purpose": "package-driven bounded learning graph execution" },
+    { "id": "episode.package.catalog", "version": 1, "purpose": "validated build-time-discovered package catalog" },
+    { "id": "visualization.script.runtime", "version": 1, "purpose": "existing Visualization Script v1 execution controls" },
+    { "id": "world.observation.sample", "version": 1, "purpose": "existing learner-authorized observation sampling operation" },
+    { "id": "model.fit", "version": 1, "purpose": "existing user-authorized local model fit action" },
+    { "id": "experiment.compare", "version": 1, "purpose": "existing learner-visible comparison setup and result" }
+  ],
+  "operations": [
+    { "id": "RESAMPLE_WORLD", "capability": "world.observation.sample", "version": 1, "changes": ["observation-sample"], "completionFacts": ["observation.sampled"], "requiresLearnerConfirmation": true },
+    { "id": "FIT_MODEL", "capability": "model.fit", "version": 1, "changes": ["fitted-model-state"], "completionFacts": ["fit.baseline.valid", "fit.active.valid", "fit.current.valid"], "requiresLearnerConfirmation": true },
+    { "id": "CREATE_COMPARISON", "capability": "experiment.compare", "version": 1, "changes": ["comparison-selection"], "completionFacts": ["comparison.current.completed"], "requiresLearnerConfirmation": true }
+  ],
+  "scenarioSources": [
+    {
+      "kind": "preset",
+      "id": "sampling-variability-world",
+      "version": 1,
+      "owner": "VOLK-ML episode scenario preset registry",
+      "publicStatus": "stable",
+      "format": "volk.episode-package.v1",
+      "minimumVerifiedApplicationVersion": "0.1.0",
+      "applicationVersionGate": false,
+      "compatibility": "The identifier and documented initialization semantics remain stable within version 1; incompatible evolution requires an explicit new contract and migration guidance."
+    }
+  ],
+  "playgrounds": [
+    { "id": "data-lab", "adapterId": "linear-regression", "version": 1 }
+  ],
+  "forbiddenPredicateIds": ["learner.mastery", "learner.understands", "director.step.completed", "agent.message.received", "button.clicked"]
+}

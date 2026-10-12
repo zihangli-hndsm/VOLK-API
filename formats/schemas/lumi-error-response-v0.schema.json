@@ -1,0 +1,20 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://raw.githubusercontent.com/zihangli-hndsm/VOLK-API/main/formats/schemas/lumi-error-response-v0.schema.json",
+  "title": "VOLK Cloud LUMI error response v0",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["error"],
+  "properties": {
+    "error": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["code", "message", "requestId"],
+      "properties": {
+        "code": { "enum": ["invalid_request", "unsupported_api_version", "invalid_policy_action", "policy_failure", "request_timeout", "request_too_large", "policy_timeout", "internal_error"] },
+        "message": { "type": "string", "minLength": 1, "maxLength": 1000 },
+        "requestId": { "type": "string", "minLength": 1, "maxLength": 128 }
+      }
+    }
+  }
+}

@@ -1,0 +1,7 @@
+# Examples
+
+`episode/linear-sampling-contrast/` is an original teaching example for review. Its six package JSON files are self-contained and independently authored. The learning and Director initial scenarios both reference the public stable `sampling-variability-world` preset (source version 1), which is also a generic experiment starting point used by formal Episode 1. This shared runtime capability does not reference formal course files, course-node IDs, private LUMI assets, transaction IDs, or Evidence IDs. The example also uses the documented fit/compare capabilities, a bounded learning graph, Agent guidance, local fallback, English and Chinese copy, and a finite Director script.
+
+It contains JSON data only. It declares no Evidence IDs, mastery result, private course ID, secret, provider instruction, or executable code. Runtime Evidence must come from the real registered detector. Arbitrary initial-scenario recipes are not supported; the current public preset is the only approved preset reference in this candidate. The ML owner confirmed the documented preset contract, initial Data and seed behavior. Dev independently verified discovery, candidate-path loading, private-preset rejection, local fallback, and Director playback for the accepted R2 worktree.
+
+`http/health-v0.http` and `http/lumi-respond-v0-legacy.http` describe behavior implemented on Cloud `main` as of 2026-10-12. `http/lumi-respond-v0-contextual-experimental.http` is explicitly experimental and is not supported by current `main`.

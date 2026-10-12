@@ -1,0 +1,20 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://raw.githubusercontent.com/zihangli-hndsm/VOLK-API/main/formats/schemas/lumi-response-v0-contextual.schema.json",
+  "title": "Experimental candidate-bound LUMI response v0",
+  "description": "Full response body for the experimental learningContext request mode; use the legacy response schema for requests without that context.",
+  "type": "object",
+  "allOf": [
+    { "$ref": "lumi-response-v0-common.schema.json" },
+    {
+      "properties": {
+        "candidateId": { "type": "string", "pattern": "^[a-z][a-z0-9]*(?:-[a-z0-9]+)*$", "minLength": 2, "maxLength": 64 },
+        "message": { "const": null }
+      },
+      "if": { "properties": { "action": { "const": "STAY_SILENT" } }, "required": ["action"] },
+      "then": { "not": { "required": ["candidateId"] } },
+      "else": { "required": ["candidateId"] }
+    }
+  ],
+  "unevaluatedProperties": false
+}

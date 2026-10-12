@@ -1,0 +1,48 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://raw.githubusercontent.com/zihangli-hndsm/VOLK-API/main/formats/schemas/agent.schema.json",
+  "title": "VOLK Episode Agent Definition v1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schemaVersion", "nodes", "budgets", "cloudCandidates"],
+  "properties": {
+    "schemaVersion": { "const": "volk.episode-agent.v1" },
+    "budgets": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["maxHintsPerNode", "cooldownMs"],
+      "properties": {
+        "maxHintsPerNode": { "type": "integer", "minimum": 0, "maximum": 20 },
+        "cooldownMs": { "type": "integer", "minimum": 0, "maximum": 3600000 }
+      }
+    },
+    "cloudCandidates": {
+      "type": "array",
+      "maxItems": 64,
+      "items": { "$ref": "cloud-learning-context.schema.json#/$defs/candidate" }
+    },
+    "nodes": {
+      "type": "array",
+      "maxItems": 256,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["nodeId", "questionPromptKeys", "allowedContextSelectors", "candidateIds", "staySilent"],
+        "properties": {
+          "nodeId": { "$ref": "learning.schema.json#/$defs/id" },
+          "questionPromptKeys": { "type": "array", "maxItems": 8, "uniqueItems": true, "items": { "$ref": "learning.schema.json#/$defs/messageKey" } },
+          "allowedContextSelectors": {
+            "type": "array",
+            "maxItems": 8,
+            "uniqueItems": true,
+            "items": { "enum": ["currentNode", "currentStage", "currentFacts", "recentSemanticEvents", "evidenceSummaries", "currentQuestion"] }
+          },
+          "candidateIds": { "type": "array", "maxItems": 8, "uniqueItems": true, "items": { "$ref": "learning.schema.json#/$defs/id" } },
+          "staySilent": { "type": "boolean" },
+          "maxHints": { "type": "integer", "minimum": 0, "maximum": 20 },
+          "cooldownMs": { "type": "integer", "minimum": 0, "maximum": 3600000 }
+        }
+      }
+    }
+  }
+}

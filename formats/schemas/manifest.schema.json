@@ -1,0 +1,70 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://raw.githubusercontent.com/zihangli-hndsm/VOLK-API/main/formats/schemas/manifest.schema.json",
+  "title": "VOLK Episode Package Manifest v1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schemaVersion",
+    "id",
+    "contentVersion",
+    "order",
+    "status",
+    "titleKey",
+    "summaryKey",
+    "playgroundId",
+    "adapterId",
+    "requiredCapabilities",
+    "files"
+  ],
+  "properties": {
+    "schemaVersion": { "const": "volk.episode-package.v1" },
+    "id": { "$ref": "#/$defs/id" },
+    "contentVersion": { "type": "string", "pattern": "^(0|[1-9][0-9]*)\\.(0|[1-9][0-9]*)\\.(0|[1-9][0-9]*)(-[0-9A-Za-z.-]+)?$", "maxLength": 64 },
+    "order": { "type": "integer", "minimum": 0, "maximum": 1000000 },
+    "status": { "enum": ["draft", "published"] },
+    "titleKey": { "$ref": "#/$defs/messageKey" },
+    "summaryKey": { "$ref": "#/$defs/messageKey" },
+    "playgroundId": { "$ref": "#/$defs/id" },
+    "adapterId": { "$ref": "#/$defs/id" },
+    "requiredCapabilities": {
+      "type": "array",
+      "maxItems": 32,
+      "uniqueItems": true,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["id", "version"],
+        "properties": {
+          "id": { "$ref": "#/$defs/capabilityId" },
+          "version": { "type": "integer", "minimum": 1, "maximum": 65535 }
+        }
+      }
+    },
+    "files": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["learning", "agent", "director", "locales"],
+      "properties": {
+        "learning": { "$ref": "#/$defs/packageJsonPath" },
+        "agent": { "$ref": "#/$defs/packageJsonPath" },
+        "director": { "$ref": "#/$defs/packageJsonPath" },
+        "locales": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["zh", "en"],
+          "properties": {
+            "zh": { "$ref": "#/$defs/packageJsonPath" },
+            "en": { "$ref": "#/$defs/packageJsonPath" }
+          }
+        }
+      }
+    }
+  },
+  "$defs": {
+    "id": { "type": "string", "pattern": "^[a-z][a-z0-9]*(?:-[a-z0-9]+)*$", "minLength": 2, "maxLength": 64 },
+    "capabilityId": { "enum": ["episode.learning.runner", "episode.package.catalog", "visualization.script.runtime", "world.observation.sample", "model.fit", "experiment.compare"] },
+    "messageKey": { "type": "string", "pattern": "^[a-z][a-z0-9]*(?:[.-][a-zA-Z0-9]+)*$", "minLength": 2, "maxLength": 128 },
+    "packageJsonPath": { "type": "string", "pattern": "^(?!/)(?!.*(?:^|/)\\.\\.(?:/|$))(?!.*:)[A-Za-z0-9._/-]+\\.json$", "maxLength": 240 }
+  }
+}
