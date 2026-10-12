@@ -1,0 +1,18 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://raw.githubusercontent.com/zihangli-hndsm/VOLK-API/main/formats/schemas/locale-v2.schema.json",
+  "title": "VOLK Episode Locale Map v2",
+  "type": "object",
+  "minProperties": 1,
+  "maxProperties": 512,
+  "propertyNames": {
+    "type": "string",
+    "pattern": "^[a-z][a-z0-9]*(?:[.-][a-zA-Z0-9]+)*$"
+  },
+  "additionalProperties": {
+    "type": "string",
+    "minLength": 1,
+    "maxLength": 4000,
+    "pattern": "\\S"
+  }
+}

@@ -1,0 +1,18 @@
+{
+  "schemaVersion": "volk.episode-director.v1",
+  "initialScenario": { "kind": "preset", "id": "sampling-variability-world", "seed": 8202 },
+  "script": {
+    "version": 1,
+    "id": "same-world-two-draws-recording",
+    "model": { "adapter": "linear-regression" },
+    "data": { "source": "current" },
+    "controls": [],
+    "layout": { "stage": [], "side": [] },
+    "primitives": [],
+    "steps": [
+      { "id": "first-fit", "invoke": { "operation": "traceFit", "args": {} }, "narrationKey": "director.first-fit", "durationMs": 600 },
+      { "id": "show-fit", "invoke": { "operation": "setBestFit", "args": {} }, "narrationKey": "director.show-fit", "durationMs": 800 },
+      { "id": "second-fit", "invoke": { "operation": "traceFit", "args": {} }, "narrationKey": "director.second-fit", "durationMs": 600 }
+    ]
+  }
+}

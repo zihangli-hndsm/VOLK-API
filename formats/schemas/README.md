@@ -35,3 +35,10 @@ The context schema validates each candidate's shape, but JSON Schema `uniqueItem
 ## Locales
 
 Locale files are package-scoped message-key maps. Each package must provide both `zh` and `en`. The package validator resolves every referenced title, body, prompt, fallback, choice, narration, and manifest key in both maps and rejects missing or blank entries. New packages must not require additions to the global locale module.
+
+## Episode Package v2 proposal
+
+- [Manifest v2](manifest-v2.schema.json)
+- [Locale map v2](locale-v2.schema.json)
+
+The v2 schema is a proposed additive contract; runtime support is pending VOLK-ML implementation and VOLK-Dev acceptance.
