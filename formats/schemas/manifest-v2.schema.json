@@ -41,6 +41,9 @@
         "published"
       ]
     },
+    "featured": {
+      "type": "boolean"
+    },
     "titleKey": {
       "$ref": "#/$defs/messageKey"
     },

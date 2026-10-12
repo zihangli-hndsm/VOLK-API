@@ -10,7 +10,7 @@ The learning, agent, director, and visualization subfile formats keep their curr
 
 ## Manifest and locale map
 
-A v2 manifest adds `defaultLocale: "en"`. `files.locales` maps each declared locale tag to a package-relative JSON file:
+A v2 manifest retains the supported v1 fields, including optional boolean `featured`, and adds `defaultLocale: "en"`. `files.locales` maps each declared locale tag to a package-relative JSON file:
 
 ```json
 {
