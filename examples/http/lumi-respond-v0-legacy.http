@@ -1,0 +1,13 @@
+### Implemented legacy LUMI v0 (no learningContext)
+POST http://127.0.0.1:8000/v0/lumi/respond
+Content-Type: application/json
+Accept: application/json
+
+{
+  "apiVersion": "0",
+  "requestId": "sampling-contrast-1",
+  "inquiry": {
+    "currentQuestion": "What changed after the new sample?"
+  },
+  "evidence": []
+}

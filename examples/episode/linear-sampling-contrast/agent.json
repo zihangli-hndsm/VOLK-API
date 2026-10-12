@@ -1,0 +1,13 @@
+{
+  "schemaVersion": "volk.episode-agent.v1",
+  "budgets": { "maxHintsPerNode": 2, "cooldownMs": 5000 },
+  "cloudCandidates": [
+    { "candidateId": "ask-next-step", "action": "ASK", "payload": { "question": "Would you like to compare now or add another sample first?" }, "requiresLearnerConfirmation": false },
+    { "candidateId": "offer-current-comparison", "action": "OFFER_COMPARISON", "payload": {}, "requiresLearnerConfirmation": false }
+  ],
+  "nodes": [
+    { "nodeId": "choose-next", "questionPromptKeys": ["questions.choose-next"], "allowedContextSelectors": ["currentNode", "currentFacts"], "candidateIds": ["ask-next-step", "offer-current-comparison"], "staySilent": true },
+    { "nodeId": "sample-again", "questionPromptKeys": ["questions.what-changed"], "allowedContextSelectors": ["currentNode", "currentFacts", "evidenceSummaries"], "candidateIds": [], "staySilent": true },
+    { "nodeId": "fit-again", "questionPromptKeys": ["questions.compare-fits"], "allowedContextSelectors": ["currentNode", "currentFacts"], "candidateIds": [], "staySilent": true }
+  ]
+}

@@ -1,0 +1,158 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://raw.githubusercontent.com/zihangli-hndsm/VOLK-API/main/formats/schemas/learning.schema.json",
+  "title": "VOLK Episode Learning Definition v1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schemaVersion", "initialScenario", "startNodeId", "limits", "nodes"],
+  "properties": {
+    "schemaVersion": { "const": "volk.episode-learning.v1" },
+    "initialScenario": { "$ref": "#/$defs/scenario" },
+    "startNodeId": { "$ref": "#/$defs/id" },
+    "limits": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["maxTransitions", "maxVisitsPerNode"],
+      "properties": {
+        "maxTransitions": { "type": "integer", "minimum": 1, "maximum": 1000 },
+        "maxVisitsPerNode": { "type": "integer", "minimum": 1, "maximum": 100 }
+      }
+    },
+    "nodes": {
+      "type": "array",
+      "minItems": 1,
+      "maxItems": 256,
+      "items": { "$ref": "#/$defs/node" }
+    }
+  },
+  "$defs": {
+    "id": { "type": "string", "pattern": "^[a-z][a-z0-9]*(?:-[a-z0-9]+)*$", "minLength": 2, "maxLength": 64 },
+    "messageKey": { "type": "string", "pattern": "^[a-z][a-z0-9]*(?:[.-][a-zA-Z0-9]+)*$", "maxLength": 128 },
+    "scenario": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["kind", "id", "seed"],
+      "properties": {
+        "kind": { "enum": ["preset", "recipe"] },
+        "id": { "$ref": "#/$defs/id" },
+        "seed": { "type": "integer", "minimum": 0, "maximum": 4294967295 }
+      }
+    },
+    "predicate": {
+      "oneOf": [
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["fact", "equals"],
+          "properties": {
+            "fact": { "enum": ["fit.baseline.valid", "fit.active.valid", "fit.current.valid", "comparison.current.completed", "observation.sampled", "learner.prediction.present"] },
+            "equals": { "type": "boolean" }
+          }
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["fact", "equals"],
+          "properties": {
+            "fact": { "const": "evidence.detector.status" },
+            "equals": { "enum": ["none", "valid-weak", "evidenced", "inconclusive"] }
+          }
+        },
+        { "type": "object", "additionalProperties": false, "required": ["all"], "properties": { "all": { "type": "array", "minItems": 1, "maxItems": 16, "items": { "$ref": "#/$defs/predicate" } } } },
+        { "type": "object", "additionalProperties": false, "required": ["any"], "properties": { "any": { "type": "array", "minItems": 1, "maxItems": 16, "items": { "$ref": "#/$defs/predicate" } } } },
+        { "type": "object", "additionalProperties": false, "required": ["not"], "properties": { "not": { "$ref": "#/$defs/predicate" } } }
+      ]
+    },
+    "action": {
+      "oneOf": [
+        {
+          "type": "object", "additionalProperties": false,
+          "required": ["id", "capability", "operation", "learnerConfirmation", "successFact"],
+          "properties": {
+            "id": { "$ref": "#/$defs/id" }, "capability": { "const": "world.observation.sample" },
+            "operation": { "const": "RESAMPLE_WORLD" }, "parameters": { "type": "object", "maxProperties": 0 },
+            "learnerConfirmation": { "const": true }, "successFact": { "const": "observation.sampled" }
+          }
+        },
+        {
+          "type": "object", "additionalProperties": false,
+          "required": ["id", "capability", "operation", "parameters", "learnerConfirmation", "successFact"],
+          "properties": {
+            "id": { "$ref": "#/$defs/id" }, "capability": { "const": "model.fit" },
+            "operation": { "const": "FIT_MODEL" },
+            "parameters": { "type": "object", "additionalProperties": false, "required": ["slot"], "properties": { "slot": { "const": "baseline" } } },
+            "learnerConfirmation": { "const": true }, "successFact": { "const": "fit.baseline.valid" }
+          }
+        },
+        {
+          "type": "object", "additionalProperties": false,
+          "required": ["id", "capability", "operation", "parameters", "learnerConfirmation", "successFact"],
+          "properties": {
+            "id": { "$ref": "#/$defs/id" }, "capability": { "const": "model.fit" },
+            "operation": { "const": "FIT_MODEL" },
+            "parameters": { "type": "object", "additionalProperties": false, "required": ["slot"], "properties": { "slot": { "const": "active" } } },
+            "learnerConfirmation": { "const": true }, "successFact": { "const": "fit.active.valid" }
+          }
+        },
+        {
+          "type": "object", "additionalProperties": false,
+          "required": ["id", "capability", "operation", "learnerConfirmation", "successFact"],
+          "properties": {
+            "id": { "$ref": "#/$defs/id" }, "capability": { "const": "experiment.compare" },
+            "operation": { "const": "CREATE_COMPARISON" }, "parameters": { "type": "object", "maxProperties": 0 },
+            "learnerConfirmation": { "const": true }, "successFact": { "const": "comparison.current.completed" }
+          }
+        }
+      ]
+    },
+    "transition": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "priority", "when", "toNodeId"],
+      "properties": {
+        "id": { "$ref": "#/$defs/id" },
+        "priority": { "type": "integer", "minimum": 0, "maximum": 10000 },
+        "when": { "$ref": "#/$defs/predicate" },
+        "toNodeId": { "$ref": "#/$defs/id" },
+        "maxTraversals": { "type": "integer", "minimum": 1, "maximum": 100 }
+      }
+    },
+    "choice": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "labelKey", "toNodeId"],
+      "properties": {
+        "id": { "$ref": "#/$defs/id" },
+        "labelKey": { "$ref": "#/$defs/messageKey" },
+        "toNodeId": { "$ref": "#/$defs/id" },
+        "maxTraversals": { "type": "integer", "minimum": 1, "maximum": 100 }
+      }
+    },
+    "node": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "kind", "titleKey", "bodyKey"],
+      "properties": {
+        "id": { "$ref": "#/$defs/id" },
+        "kind": { "enum": ["orientation", "prediction", "action", "observation", "reflection", "choice", "end"] },
+        "titleKey": { "$ref": "#/$defs/messageKey" },
+        "bodyKey": { "$ref": "#/$defs/messageKey" },
+        "questionPromptKeys": { "type": "array", "maxItems": 8, "uniqueItems": true, "items": { "$ref": "#/$defs/messageKey" } },
+        "semanticTarget": { "enum": ["fit", "comparison", "evidence", "world", "data", "model"] },
+        "actions": { "type": "array", "maxItems": 8, "uniqueItems": true, "items": { "$ref": "#/$defs/action" } },
+        "choices": { "type": "array", "minItems": 2, "maxItems": 8, "items": { "$ref": "#/$defs/choice" } },
+        "transitions": { "type": "array", "maxItems": 16, "items": { "$ref": "#/$defs/transition" } },
+        "localFallback": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["messageKey"],
+          "properties": {
+            "messageKey": { "$ref": "#/$defs/messageKey" },
+            "actionIds": { "type": "array", "maxItems": 8, "uniqueItems": true, "items": { "$ref": "#/$defs/id" } },
+            "staySilent": { "type": "boolean" }
+          }
+        }
+      }
+    }
+  }
+}

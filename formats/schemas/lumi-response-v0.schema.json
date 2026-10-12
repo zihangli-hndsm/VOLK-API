@@ -1,0 +1,10 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://raw.githubusercontent.com/zihangli-hndsm/VOLK-API/main/formats/schemas/lumi-response-v0.schema.json",
+  "title": "VOLK Cloud legacy LUMI response v0",
+  "allOf": [
+    { "$ref": "lumi-response-v0-common.schema.json" },
+    { "not": { "required": ["candidateId"] } }
+  ],
+  "unevaluatedProperties": false
+}

@@ -1,0 +1,58 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://raw.githubusercontent.com/zihangli-hndsm/VOLK-API/main/formats/schemas/director.schema.json",
+  "title": "VOLK Episode Director Definition v1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schemaVersion", "initialScenario", "script"],
+  "properties": {
+    "schemaVersion": { "const": "volk.episode-director.v1" },
+    "initialScenario": { "$ref": "learning.schema.json#/$defs/scenario" },
+    "script": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["version", "id", "model", "data", "controls", "layout", "primitives", "steps"],
+      "properties": {
+        "version": { "const": 1 },
+        "id": { "type": "string", "pattern": "^[a-z][a-z0-9]*(?:-[a-z0-9]+)*$", "maxLength": 64 },
+        "model": { "type": "object", "required": ["adapter"], "properties": { "adapter": { "type": "string", "maxLength": 64 } } },
+        "data": { "type": "object", "required": ["source"], "properties": { "source": { "type": "string", "maxLength": 64 } } },
+        "controls": { "type": "array", "maxItems": 64, "items": { "type": "object" } },
+        "layout": { "type": "object", "maxProperties": 16 },
+        "primitives": { "type": "array", "maxItems": 40, "items": { "type": "object" } },
+        "steps": {
+          "type": "array",
+          "minItems": 1,
+          "maxItems": 200,
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["id"],
+            "properties": {
+              "id": { "type": "string", "pattern": "^[a-z][a-z0-9]*(?:-[a-z0-9]+)*$", "maxLength": 64 },
+              "invoke": { "type": ["object", "array"] },
+              "setControl": { "type": ["object", "array"] },
+              "capture": { "type": ["object", "array"] },
+              "restoreCapture": { "type": ["object", "array"] },
+              "show": { "type": ["object", "array"] },
+              "hide": { "type": ["object", "array"] },
+              "highlight": { "type": ["object", "array"] },
+              "reveal": { "type": ["object", "array"] },
+              "reset": { "type": ["object", "array"] },
+              "annotate": { "type": ["object", "array"] },
+              "wait": { "type": ["object", "array"] },
+              "narrationKey": { "type": "string", "maxLength": 128 },
+              "durationMs": { "type": "integer", "minimum": 0, "maximum": 60000 }
+            },
+            "oneOf": [
+              { "required": ["invoke"] }, { "required": ["setControl"] }, { "required": ["capture"] },
+              { "required": ["restoreCapture"] }, { "required": ["show"] }, { "required": ["hide"] },
+              { "required": ["highlight"] }, { "required": ["reveal"] }, { "required": ["reset"] },
+              { "required": ["annotate"] }, { "required": ["wait"] }
+            ]
+          }
+        }
+      }
+    }
+  }
+}

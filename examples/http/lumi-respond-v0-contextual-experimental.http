@@ -1,0 +1,32 @@
+### EXPERIMENTAL — not supported by current Cloud main
+### Current Cloud main rejects learningContext; do not retry without its constraints.
+POST http://127.0.0.1:8000/v0/lumi/respond
+Content-Type: application/json
+Accept: application/json
+
+{
+  "apiVersion": "0",
+  "requestId": "sampling-contrast-2",
+  "inquiry": {
+    "currentQuestion": "Would you like to compare now?"
+  },
+  "learningContext": {
+    "package": {
+      "id": "linear-sampling-contrast",
+      "contentVersion": "1.0.0",
+      "fingerprint": "6f5803c2fc23f1840b93808856595079f526a6f62513429ffba66d7c0a532962"
+    },
+    "currentNode": {
+      "id": "choose-next",
+      "kind": "choice"
+    },
+    "allowedCandidates": [
+      {
+        "candidateId": "offer-current-comparison",
+        "action": "OFFER_COMPARISON",
+        "payload": {},
+        "requiresLearnerConfirmation": false
+      }
+    ]
+  }
+}
