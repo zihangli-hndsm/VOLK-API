@@ -2,6 +2,8 @@
 
 This namespace describes portable Build metadata. The [schema](workspace.schema.json) uses JSON Schema 2020-12, with the explicit discriminator `schemaVersion` on each top-level record. Validate the schema and [lifecycle and semantic vectors](lifecycle.json) before accepting a record. Fields are closed in v1. Any incompatible change needs a new version. Nothing in the namespace opens a server endpoint or changes the Episode or LUMI contracts. The [fixture](fixture.json) has synthetic metadata; its sample digest covers the two UTF-8 bytes for `{}` and demonstrates byte identity only.
 
+Run `node formats/build/v1/check-lifecycle.mjs` from the repository root to exercise the metadata examples. The checker uses small synthetic records and does not start a runtime. The license scope remains defined by [LICENSE-SCOPE.md](../../../LICENSE-SCOPE.md).
+
 ## Identities and data
 
 - A workspace is a UUID namespace. A resource has a UUID inside the workspace, a kind and immutable, monotonically increasing positive revisions. Its exact reference contains the workspace and resource IDs, revision and lowercase content SHA-256. Revisions are identities, not localized labels. A stored version is always resolved by its exact reference. Reject conflicts and never silently replace a missing revision with the latest.
