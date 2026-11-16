@@ -7,6 +7,7 @@ This namespace describes portable Build metadata. The [schema](workspace.schema.
 - A workspace is a UUID namespace. A resource has a UUID inside the workspace, a kind and immutable, monotonically increasing positive revisions. Its exact reference contains the workspace and resource IDs, revision and lowercase content SHA-256. Revisions are identities, not localized labels. A stored version is always resolved by its exact reference. Reject conflicts and never silently replace a missing revision with the latest.
 - A resource record holds metadata and a storage `kind`. The body stays in a local byte store or behind an adapter-owned opaque locator. There is no raw file path, URL, credential or file data in a portable locator. Hash stored payload bytes directly; for portable JSON payloads encode canonical JSON per RFC 8785 as UTF-8. Independently verify records before materialization. Do not deduplicate authority: identical bytes may share storage inside a workspace without sharing file handles or grants.
 - Workflow, Agent and Tool are resource kinds. Native graph v10 exports and pinned Workflow Tool binding/contracts remain separate payload identities. Their adapters must carry the native digest and target allowlist internally; recording a Build resource revision never authorizes execution. Tool effect claims, effective grants, actual target capability and resource consent are validated separately in the owning runtime.
+- Preserve a native Workflow snapshot as opaque original bytes. The Resource SHA-256 hashes the exact stored body. It does not replace the native source, semantic graph, execution or package identity. A re-encoded package may yield a different Resource SHA even if its execution identity is unchanged. Resource retrieval must return the exact bytes, allowing the native Workflow validator to recover the same identities.
 
 ## Run and trace
 
@@ -19,4 +20,15 @@ This namespace describes portable Build metadata. The [schema](workspace.schema.
 
 ## Environment adapters
 
-The first implementation uses local browser capabilities. A target profile and its current status are distinct, and unknown targets are unavailable. A cloud sync adapter will need an authenticated owner/workspace and a verified base revision for conditional, idempotent metadata writes; an execute adapter needs current runtime capability, immutable accepted snapshot and effective authorization. Build v1 local operation does not perform cloud synchronization or synthesize a hosted success result.
+The Phase 1 test profile is `local / browser-cpu / 1`. A target declaration and a live assessment are distinct. Unknown profiles, unknown versions and cloud targets are unavailable in the Phase 1 adapter. A local target can also be unavailable if the current environment cannot run its registered operations.
+
+The application-facing adapters have these minimum contracts. They remain metadata-only in Phase 1 and define no HTTP endpoints.
+
+| Operation | Input | Result |
+|---|---|---|
+| `assess` | Exact target, requested operation, local immutable subject and input references | `volk.build.capability.v1`; a successful assessment still requires effective execution grants |
+| `syncMetadata` | Authenticated owner context, workspace ID, base revision, idempotency key, fingerprint of the permitted metadata projection | New accepted revision or typed `target_unavailable`, `workspace_mismatch`, `revision_conflict` or `idempotency_conflict` |
+| `submit` | Unique run ID, exact target, immutable input snapshot and effective local or hosted grants | Stored queued run or typed error before dispatch |
+| `inspect` / `cancel` | Trusted owner/workspace context and scoped run ID | Current compatible run record; cancellation cannot create an output |
+
+Cloud `syncMetadata` and `submit` return `target_unavailable` before write, enqueue or network dispatch in Phase 1. A future hosted endpoint derives owner identity from authentication, uses a scoped compare-and-set revision, and binds idempotency to owner, workspace and payload fingerprint. Publish its wire format and conformance separately before allowing remote execution or sharing.

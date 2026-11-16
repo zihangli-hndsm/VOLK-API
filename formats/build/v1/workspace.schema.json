@@ -44,7 +44,7 @@
     },
     "target": {
       "type": "object", "additionalProperties": false,
-      "required": ["environment", "profile"],
+      "required": ["environment", "profile", "profileVersion"],
       "properties": {
         "environment": { "enum": ["local", "cloud"] }, "profile": { "$ref": "#/$defs/code" },
         "profileVersion": { "$ref": "#/$defs/code" }
@@ -102,7 +102,7 @@
         { "if": { "properties": { "status": { "enum": ["succeeded", "failed", "cancelled"] } } }, "then": { "required": ["finishedAt"] }, "else": { "not": { "required": ["finishedAt"] } } },
         { "if": { "properties": { "status": { "const": "failed" } } }, "then": { "required": ["errorCode"] } },
         { "if": { "properties": { "status": { "enum": ["running", "waitingApproval", "succeeded"] } } }, "then": { "required": ["startedAt"] } },
-        { "if": { "properties": { "status": { "enum": ["queued", "running", "waitingApproval", "cancelled"] } } }, "then": { "properties": { "outputs": { "maxItems": 0 } } } }
+        { "if": { "properties": { "status": { "enum": ["queued", "running", "waitingApproval", "cancelled"] } } }, "then": { "properties": { "outputs": { "type": "array", "maxItems": 0 } } } }
       ]
     },
     "event": {
