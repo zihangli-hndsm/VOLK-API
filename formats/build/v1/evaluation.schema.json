@@ -1,0 +1,76 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/zihangli-hndsm/VOLK-API/formats/build/v1/evaluation.schema.json",
+  "oneOf": [{ "$ref": "#/$defs/suite" }, { "$ref": "#/$defs/report" }],
+  "$defs": {
+    "caseId": { "type": "string", "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]{0,95}$" },
+    "score": { "type": ["number", "null"], "minimum": 0, "maximum": 1 },
+    "count": { "type": "integer", "minimum": 0, "maximum": 64 },
+    "criterion": {
+      "oneOf": [
+        {
+          "type": "object", "additionalProperties": false, "required": ["kind"],
+          "properties": { "kind": { "enum": ["exact", "human"] } }
+        },
+        {
+          "type": "object", "additionalProperties": false, "required": ["kind", "mode"],
+          "properties": {
+            "kind": { "const": "string" }, "mode": { "enum": ["exact", "contains"] },
+            "trim": { "type": "boolean" }, "ignoreCase": { "type": "boolean" }
+          }
+        },
+        {
+          "type": "object", "additionalProperties": false, "required": ["kind", "schema"],
+          "properties": { "kind": { "const": "schema" }, "schema": { "type": ["object", "boolean"] } }
+        },
+        {
+          "type": "object", "additionalProperties": false, "required": ["kind", "path", "operator"],
+          "properties": {
+            "kind": { "const": "rule" },
+            "path": { "type": "array", "maxItems": 16, "items": { "oneOf": [
+              { "type": "string" }, { "type": "integer", "minimum": 0, "maximum": 9007199254740991 }
+            ] } },
+            "operator": { "enum": ["exists", "equals", "contains", "minimum", "maximum"] }, "value": {}
+          },
+          "allOf": [
+            { "if": { "properties": { "operator": { "const": "exists" } } }, "then": { "not": { "required": ["value"] } }, "else": { "required": ["value"] } },
+            { "if": { "properties": { "operator": { "enum": ["minimum", "maximum"] } } }, "then": { "properties": { "value": { "type": "number" } } } }
+          ]
+        }
+      ]
+    },
+    "suite": {
+      "type": "object", "additionalProperties": false, "required": ["schemaVersion", "cases"],
+      "properties": {
+        "schemaVersion": { "const": "volk.build.evaluation-suite.v1" },
+        "cases": { "type": "array", "minItems": 1, "maxItems": 64, "items": {
+          "type": "object", "additionalProperties": false, "required": ["id", "criteria"],
+          "properties": {
+            "id": { "$ref": "#/$defs/caseId" }, "criteria": { "$ref": "#/$defs/criterion" },
+            "input": {}, "actual": {}, "expected": {}
+          }
+        } }
+      }
+    },
+    "report": {
+      "type": "object", "additionalProperties": false, "required": ["schemaVersion", "cases", "summary"],
+      "properties": {
+        "schemaVersion": { "const": "volk.build.evaluation-report.v1" },
+        "cases": { "type": "array", "minItems": 1, "maxItems": 64, "items": {
+          "type": "object", "additionalProperties": false, "required": ["id", "status", "score", "errorCategory"],
+          "properties": {
+            "id": { "$ref": "#/$defs/caseId" }, "status": { "enum": ["passed", "failed", "pending"] },
+            "score": { "$ref": "#/$defs/score" }, "errorCategory": { "enum": [null, "humanReviewRequired", "invalidCriteria", "missingActual", "missingExpected", "exactMismatch", "stringExpected", "stringMismatch", "unsupportedSchema", "schemaMismatch", "ruleMismatch"] }
+          }
+        } },
+        "summary": {
+          "type": "object", "additionalProperties": false, "required": ["passed", "failed", "pending", "score"],
+          "properties": {
+            "passed": { "$ref": "#/$defs/count" }, "failed": { "$ref": "#/$defs/count" },
+            "pending": { "$ref": "#/$defs/count" }, "score": { "$ref": "#/$defs/score" }
+          }
+        }
+      }
+    }
+  }
+}

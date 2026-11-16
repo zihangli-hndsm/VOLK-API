@@ -34,3 +34,9 @@ The application-facing adapters have these minimum contracts. They remain metada
 | `inspect` / `cancel` | Trusted owner/workspace context and scoped run ID | Current compatible run record; cancellation cannot create an output |
 
 Cloud `syncMetadata` and `submit` return `target_unavailable` before write, enqueue or network dispatch in Phase 1. A future hosted endpoint derives owner identity from authentication, uses a scoped compare-and-set revision, and binds idempotency to owner, workspace and payload fingerprint. Publish its wire format and conformance separately before allowing remote execution or sharing.
+
+## Local evaluation records
+
+The [evaluation schema](evaluation.schema.json) defines a local deterministic suite and its summary report. Cases use distinct IDs within each suite. Exact comparison is over JSON values. String comparison is literal unless the case explicitly requests trimming or case folding. A rule walks an own-property path, then applies one finite operator. The schema criterion accepts a bounded structural subset including Boolean schemas, types, property and item constraints, equality, enum, and numeric or length bounds. Unsupported schema features are reported explicitly. Evaluation does not fetch schemas or run code.
+
+The runner supplies actual observations from the selected inputs or run. An unobserved actual yields `missingActual`. Invalid and unavailable data leave that case unscored; a human case remains pending. Scores are `1` or `0` for measured cases, with a summary mean over measured scores only and `null` when none are measured. Counts represent the recorded case states. The report carries only IDs, decisions, scores and diagnostic categories. Persist input, run, and output references through Build Workspace metadata rather than copying inputs, expected/actual values or model material into the report. Validate the listed semantics in addition to structural shape.
