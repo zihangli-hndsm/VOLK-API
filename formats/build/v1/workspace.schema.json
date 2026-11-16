@@ -1,0 +1,85 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/zihangli-hndsm/VOLK-API/formats/build/v1/workspace.schema.json",
+  "oneOf": [
+    { "$ref": "#/$defs/resource" },
+    { "$ref": "#/$defs/run" },
+    { "$ref": "#/$defs/event" }
+  ],
+  "$defs": {
+    "uuid": { "type": "string", "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$" },
+    "sha256": { "type": "string", "pattern": "^[0-9a-f]{64}$" },
+    "counter": { "type": "integer", "minimum": 0, "maximum": 9007199254740991 },
+    "revision": { "type": "integer", "minimum": 1, "maximum": 9007199254740991 },
+    "code": { "type": "string", "pattern": "^[A-Za-z0-9][A-Za-z0-9._-]{0,95}$" },
+    "kind": { "enum": ["dataset", "model", "embeddingIndex", "knowledgeBase", "workflow", "tool", "agent", "evaluationSuite", "simulation", "run", "artifact"] },
+    "resourceRef": {
+      "type": "object", "additionalProperties": false,
+      "required": ["workspaceId", "resourceId", "revision", "contentSha256"],
+      "properties": {
+        "workspaceId": { "$ref": "#/$defs/uuid" }, "resourceId": { "$ref": "#/$defs/uuid" },
+        "revision": { "$ref": "#/$defs/revision" }, "contentSha256": { "$ref": "#/$defs/sha256" }
+      }
+    },
+    "resourceRefs": { "type": "array", "items": { "$ref": "#/$defs/resourceRef" }, "uniqueItems": true },
+    "storage": {
+      "type": "object", "additionalProperties": false,
+      "required": ["kind", "locator"],
+      "properties": {
+        "kind": { "enum": ["local", "cloud", "external"] }, "locator": { "$ref": "#/$defs/uuid" },
+        "byteLength": { "$ref": "#/$defs/counter" }
+      }
+    },
+    "resource": {
+      "type": "object", "additionalProperties": false,
+      "required": ["schemaVersion", "ref", "kind", "name", "storage", "dependencies", "createdAt"],
+      "properties": {
+        "schemaVersion": { "const": "volk.build.resource.v1" }, "ref": { "$ref": "#/$defs/resourceRef" },
+        "kind": { "$ref": "#/$defs/kind" }, "name": { "type": "string", "minLength": 1, "maxLength": 160 },
+        "storage": { "$ref": "#/$defs/storage" }, "dependencies": { "$ref": "#/$defs/resourceRefs" },
+        "createdAt": { "$ref": "#/$defs/counter" }
+      }
+    },
+    "target": {
+      "type": "object", "additionalProperties": false,
+      "required": ["environment", "profile"],
+      "properties": {
+        "environment": { "enum": ["local", "cloud"] }, "profile": { "$ref": "#/$defs/code" }
+      }
+    },
+    "budget": {
+      "type": "object", "additionalProperties": false,
+      "required": ["timeoutMs", "maxSteps"],
+      "properties": {
+        "timeoutMs": { "$ref": "#/$defs/revision" }, "maxSteps": { "$ref": "#/$defs/revision" },
+        "maxCostMicros": { "$ref": "#/$defs/counter" }, "currency": { "type": "string", "pattern": "^[A-Z]{3}$" }
+      },
+      "dependentRequired": { "maxCostMicros": ["currency"], "currency": ["maxCostMicros"] }
+    },
+    "run": {
+      "type": "object", "additionalProperties": false,
+      "required": ["schemaVersion", "workspaceId", "runId", "kind", "subject", "inputs", "target", "budget", "status", "createdAt", "outputs"],
+      "properties": {
+        "schemaVersion": { "const": "volk.build.run.v1" }, "workspaceId": { "$ref": "#/$defs/uuid" }, "runId": { "$ref": "#/$defs/uuid" },
+        "kind": { "enum": ["agent", "workflow", "evaluation", "simulation"] },
+        "subject": { "$ref": "#/$defs/resourceRef" }, "inputs": { "$ref": "#/$defs/resourceRefs" },
+        "target": { "$ref": "#/$defs/target" }, "budget": { "$ref": "#/$defs/budget" },
+        "status": { "enum": ["queued", "running", "waitingApproval", "succeeded", "failed", "cancelled"] },
+        "createdAt": { "$ref": "#/$defs/counter" }, "outputs": { "$ref": "#/$defs/resourceRefs" },
+        "errorCode": { "$ref": "#/$defs/code" }
+      }
+    },
+    "event": {
+      "type": "object", "additionalProperties": false,
+      "required": ["schemaVersion", "eventId", "runId", "sequence", "timestamp", "type", "sourceEnvironment"],
+      "properties": {
+        "schemaVersion": { "const": "volk.build.event.v1" }, "eventId": { "$ref": "#/$defs/uuid" }, "runId": { "$ref": "#/$defs/uuid" },
+        "sequence": { "$ref": "#/$defs/revision" }, "timestamp": { "$ref": "#/$defs/counter" },
+        "type": { "enum": ["run.started", "run.progress", "run.completed", "run.failed", "run.cancelled", "tool.invoked", "tool.completed", "tool.failed", "model.requested", "model.completed", "approval.requested", "approval.resolved", "artifact.created"] },
+        "sourceEnvironment": { "enum": ["local", "cloud"] }, "parentEventId": { "$ref": "#/$defs/uuid" },
+        "resource": { "$ref": "#/$defs/resourceRef" }, "code": { "$ref": "#/$defs/code" },
+        "elapsedMs": { "$ref": "#/$defs/counter" }, "inputTokens": { "$ref": "#/$defs/counter" }, "outputTokens": { "$ref": "#/$defs/counter" }
+      }
+    }
+  }
+}
