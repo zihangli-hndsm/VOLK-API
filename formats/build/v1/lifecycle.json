@@ -1,0 +1,38 @@
+{
+  "schemaVersion": "volk.build.lifecycle.v1",
+  "runTransitions": {
+    "queued": ["running", "failed", "cancelled"],
+    "running": ["waitingApproval", "succeeded", "failed", "cancelled"],
+    "waitingApproval": ["running", "failed", "cancelled"],
+    "succeeded": [],
+    "failed": [],
+    "cancelled": []
+  },
+  "correlatedEventParents": {
+    "tool.completed": "tool.invoked",
+    "tool.failed": "tool.invoked",
+    "model.completed": "model.requested",
+    "approval.resolved": "approval.requested"
+  },
+  "transitionRejections": [
+    { "case": "queued-success", "from": "queued", "to": "succeeded", "error": "invalid_transition" },
+    { "case": "approval-skipped", "from": "waitingApproval", "to": "succeeded", "error": "invalid_transition" },
+    { "case": "cancelled-late-output", "from": "cancelled", "to": "succeeded", "error": "terminal_run" },
+    { "case": "stale-approval", "from": "waitingApproval", "to": "running", "approval": "stale", "error": "approval_required" },
+    { "case": "denied-approval", "from": "waitingApproval", "to": "running", "approval": "denied", "error": "approval_required" }
+  ],
+  "eventCases": [
+    { "case": "valid-invocation-parent", "operation": "matchingParent", "expected": "accepted" },
+    { "case": "cross-workspace-reference", "operation": "otherWorkspace", "expected": "workspace_mismatch" },
+    { "case": "event-parent-in-other-run", "operation": "otherRunParent", "expected": "event_parent_invalid" },
+    { "case": "irrelevant-parent", "operation": "wrongParentType", "expected": "event_parent_invalid" },
+    { "case": "replayed-identical-event", "operation": "sameReplay", "expected": "unchanged" },
+    { "case": "conflicting-event-replay", "operation": "conflictingReplay", "expected": "event_conflict" },
+    { "case": "cancelled-late-output", "operation": "lateArtifact", "expected": "terminal_run" }
+  ],
+  "targetCases": [
+    { "target": { "environment": "local", "profile": "browser-cpu", "profileVersion": "1" }, "expected": "available" },
+    { "target": { "environment": "local", "profile": "browser-cpu", "profileVersion": "9" }, "expected": "target_unavailable" },
+    { "target": { "environment": "cloud", "profile": "browser-cpu", "profileVersion": "1" }, "expected": "target_unavailable" }
+  ]
+}

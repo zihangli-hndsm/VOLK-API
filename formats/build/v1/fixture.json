@@ -1,0 +1,44 @@
+{
+  "resource": {
+    "schemaVersion": "volk.build.resource.v1",
+    "ref": {
+      "workspaceId": "49c5f416-1bae-4267-b58a-44f76136236f",
+      "resourceId": "28d30f36-0e15-4c46-8327-6c8cd4ada61b",
+      "revision": 1,
+      "contentSha256": "44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a"
+    },
+    "kind": "workflow",
+    "name": "Example workflow reference",
+    "storage": { "kind": "local", "locator": "f0f4c518-51b2-4149-8cbb-f08bc6cbfc75", "byteLength": 2 },
+    "dependencies": [],
+    "createdAt": 0
+  },
+  "run": {
+    "schemaVersion": "volk.build.run.v1",
+    "workspaceId": "49c5f416-1bae-4267-b58a-44f76136236f",
+    "runId": "d720c454-cb3c-40e4-907f-e35153caf5b4",
+    "kind": "workflow",
+    "subject": {
+      "workspaceId": "49c5f416-1bae-4267-b58a-44f76136236f",
+      "resourceId": "28d30f36-0e15-4c46-8327-6c8cd4ada61b",
+      "revision": 1,
+      "contentSha256": "44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a"
+    },
+    "inputs": [],
+    "target": { "environment": "local", "profile": "browser-cpu", "profileVersion": "1" },
+    "budget": { "timeoutMs": 5000, "maxSteps": 4 },
+    "status": "running",
+    "createdAt": 0,
+    "startedAt": 1,
+    "outputs": []
+  },
+  "event": {
+    "schemaVersion": "volk.build.event.v1",
+    "eventId": "5cd5494d-f637-4300-8610-b710ecf3b7c1",
+    "runId": "d720c454-cb3c-40e4-907f-e35153caf5b4",
+    "sequence": 1,
+    "timestamp": 1,
+    "type": "run.started",
+    "sourceEnvironment": "local"
+  }
+}

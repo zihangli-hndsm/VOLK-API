@@ -16,6 +16,7 @@ The API documentation excludes account, billing, quota, administrative, and test
 
 - [Open Client HTTP API](api/README.md)
 - [Episode Package v1](formats/episode-package-v1.md)
+- [Build Workspace v1 metadata](formats/build/v1/README.md)
 - [JSON Schema notes](formats/schemas/README.md)
 - [Examples](examples/README.md)
 - [Compatibility](compatibility.md)
