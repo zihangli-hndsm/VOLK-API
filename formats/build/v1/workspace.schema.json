@@ -4,7 +4,8 @@
   "oneOf": [
     { "$ref": "#/$defs/resource" },
     { "$ref": "#/$defs/run" },
-    { "$ref": "#/$defs/event" }
+    { "$ref": "#/$defs/event" },
+    { "$ref": "#/$defs/capability" }
   ],
   "$defs": {
     "uuid": { "type": "string", "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$" },
@@ -37,6 +38,7 @@
         "schemaVersion": { "const": "volk.build.resource.v1" }, "ref": { "$ref": "#/$defs/resourceRef" },
         "kind": { "$ref": "#/$defs/kind" }, "name": { "type": "string", "minLength": 1, "maxLength": 160 },
         "storage": { "$ref": "#/$defs/storage" }, "dependencies": { "$ref": "#/$defs/resourceRefs" },
+        "capabilities": { "type": "array", "items": { "$ref": "#/$defs/code" }, "uniqueItems": true },
         "createdAt": { "$ref": "#/$defs/counter" }
       }
     },
@@ -44,7 +46,33 @@
       "type": "object", "additionalProperties": false,
       "required": ["environment", "profile"],
       "properties": {
-        "environment": { "enum": ["local", "cloud"] }, "profile": { "$ref": "#/$defs/code" }
+        "environment": { "enum": ["local", "cloud"] }, "profile": { "$ref": "#/$defs/code" },
+        "profileVersion": { "$ref": "#/$defs/code" }
+      }
+    },
+    "capability": {
+      "type": "object", "additionalProperties": false,
+      "required": ["schemaVersion", "target", "status", "assessedAt"],
+      "properties": {
+        "schemaVersion": { "const": "volk.build.capability.v1" }, "target": { "$ref": "#/$defs/target" },
+        "status": { "enum": ["available", "unavailable"] }, "assessedAt": { "$ref": "#/$defs/counter" },
+        "reasonCode": { "$ref": "#/$defs/code" }
+      }
+    },
+    "provenance": {
+      "type": "object", "additionalProperties": false,
+      "required": ["runtime", "runtimeVersion"],
+      "properties": {
+        "runtime": { "$ref": "#/$defs/code" }, "runtimeVersion": { "$ref": "#/$defs/code" },
+        "definitionDigest": { "$ref": "#/$defs/sha256" }, "configurationDigest": { "$ref": "#/$defs/sha256" },
+        "model": { "$ref": "#/$defs/resourceRef" }
+      }
+    },
+    "approvalEvidence": {
+      "type": "object", "additionalProperties": false,
+      "required": ["eventId", "decision"],
+      "properties": {
+        "eventId": { "$ref": "#/$defs/uuid" }, "decision": { "enum": ["approved", "denied", "revoked", "expired"] }
       }
     },
     "budget": {
@@ -66,8 +94,16 @@
         "target": { "$ref": "#/$defs/target" }, "budget": { "$ref": "#/$defs/budget" },
         "status": { "enum": ["queued", "running", "waitingApproval", "succeeded", "failed", "cancelled"] },
         "createdAt": { "$ref": "#/$defs/counter" }, "outputs": { "$ref": "#/$defs/resourceRefs" },
-        "errorCode": { "$ref": "#/$defs/code" }
-      }
+        "startedAt": { "$ref": "#/$defs/counter" }, "finishedAt": { "$ref": "#/$defs/counter" },
+        "errorCode": { "$ref": "#/$defs/code" }, "provenance": { "$ref": "#/$defs/provenance" },
+        "approvals": { "type": "array", "items": { "$ref": "#/$defs/approvalEvidence" }, "uniqueItems": true }
+      },
+      "allOf": [
+        { "if": { "properties": { "status": { "enum": ["succeeded", "failed", "cancelled"] } } }, "then": { "required": ["finishedAt"] }, "else": { "not": { "required": ["finishedAt"] } } },
+        { "if": { "properties": { "status": { "const": "failed" } } }, "then": { "required": ["errorCode"] } },
+        { "if": { "properties": { "status": { "enum": ["running", "waitingApproval", "succeeded"] } } }, "then": { "required": ["startedAt"] } },
+        { "if": { "properties": { "status": { "enum": ["queued", "running", "waitingApproval", "cancelled"] } } }, "then": { "properties": { "outputs": { "maxItems": 0 } } } }
+      ]
     },
     "event": {
       "type": "object", "additionalProperties": false,
@@ -78,8 +114,13 @@
         "type": { "enum": ["run.started", "run.progress", "run.completed", "run.failed", "run.cancelled", "tool.invoked", "tool.completed", "tool.failed", "model.requested", "model.completed", "approval.requested", "approval.resolved", "artifact.created"] },
         "sourceEnvironment": { "enum": ["local", "cloud"] }, "parentEventId": { "$ref": "#/$defs/uuid" },
         "resource": { "$ref": "#/$defs/resourceRef" }, "code": { "$ref": "#/$defs/code" },
+        "decision": { "enum": ["approved", "denied", "revoked", "expired"] },
         "elapsedMs": { "$ref": "#/$defs/counter" }, "inputTokens": { "$ref": "#/$defs/counter" }, "outputTokens": { "$ref": "#/$defs/counter" }
-      }
+      },
+      "allOf": [
+        { "if": { "properties": { "type": { "const": "approval.resolved" } } }, "then": { "required": ["decision", "parentEventId"] }, "else": { "not": { "required": ["decision"] } } },
+        { "if": { "properties": { "type": { "enum": ["tool.completed", "tool.failed", "model.completed"] } } }, "then": { "required": ["parentEventId"] } }
+      ]
     }
   }
 }

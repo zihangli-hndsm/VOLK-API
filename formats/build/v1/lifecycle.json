@@ -1,0 +1,28 @@
+{
+  "schemaVersion": "volk.build.lifecycle.v1",
+  "runTransitions": {
+    "queued": ["running", "failed", "cancelled"],
+    "running": ["waitingApproval", "succeeded", "failed", "cancelled"],
+    "waitingApproval": ["running", "failed", "cancelled"],
+    "succeeded": [],
+    "failed": [],
+    "cancelled": []
+  },
+  "correlatedEventParents": {
+    "tool.completed": "tool.invoked",
+    "tool.failed": "tool.invoked",
+    "model.completed": "model.requested",
+    "approval.resolved": "approval.requested"
+  },
+  "semanticRejectionVectors": [
+    { "case": "queued-success", "from": "queued", "to": "succeeded", "error": "invalid_transition" },
+    { "case": "approval-skipped", "from": "waitingApproval", "to": "succeeded", "error": "invalid_transition" },
+    { "case": "cancelled-late-output", "from": "cancelled", "to": "succeeded", "error": "terminal_run" },
+    { "case": "stale-approval", "from": "waitingApproval", "to": "running", "approval": "stale", "error": "approval_required" },
+    { "case": "denied-approval", "from": "waitingApproval", "to": "running", "approval": "denied", "error": "approval_required" },
+    { "case": "cross-workspace-reference", "error": "workspace_mismatch" },
+    { "case": "event-parent-in-other-run", "error": "event_parent_invalid" },
+    { "case": "conflicting-event-replay", "error": "event_conflict" },
+    { "case": "unknown-target", "error": "target_unavailable" }
+  ]
+}
