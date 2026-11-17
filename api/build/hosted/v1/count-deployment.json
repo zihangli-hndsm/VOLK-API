@@ -1,0 +1,23 @@
+{
+  "schemaVersion": "volk.build.hosted-deployment.v1",
+  "workspaceId": "synthetic-workspace",
+  "workspaceRevision": "synthetic-r1",
+  "agentId": "synthetic-count-agent",
+  "tool": {
+    "id": "count-distinct-category-codes",
+    "rows": [
+      {
+        "categoryCode": "A"
+      },
+      {
+        "categoryCode": "B"
+      },
+      {
+        "categoryCode": "A"
+      },
+      {
+        "categoryCode": "C"
+      }
+    ]
+  }
+}
